@@ -1,0 +1,271 @@
+import { spawn } from "bun"
+import { rmSync, existsSync } from "fs"
+
+type Empty = Record<PropertyKey, never>
+type Location = Empty | {
+    offset: number
+    file: string | undefined
+    line: number
+    col: number
+    tokLen: number
+}
+
+// Basic components of an ASTNode, individual nodes will extend this.
+export interface ASTNode {
+    id: string
+    kind: string
+    loc: Location
+    range: {begin: Location, end: Location}
+    inner?: ASTNode[]
+}
+
+// The nodes that we are interested in are:
+// - Function declarations
+// - Parameter declarations
+// - Type declarations
+// - Built-in types
+
+// Function declarations
+export interface FunctionDecl extends ASTNode {
+    kind: "FunctionDecl"
+    name: string
+    mangledName: string
+    type: {qualType: string}
+    inner: ParamVarDecl[]
+}
+
+// Parameter declarations
+export interface ParamVarDecl extends ASTNode {
+    kind: "ParmVarDecl"
+    name: string
+    type: {qualType: string}
+}
+
+// Type declarations
+export interface TypedefDecl extends ASTNode {
+    kind: "TypedefDecl"
+    name: string
+    type: {qualType: string, desugaredQualType: string | undefined}
+}
+
+// Built-in types
+export interface BuiltinType extends ASTNode {
+    kind: "BuiltinType"
+    type: {qualType: string}
+    inner: undefined
+}
+
+function isFunctionDecl(node: ASTNode): node is FunctionDecl {
+    if (node.kind === "FunctionDecl") {
+        // Check that it has its required fields
+        if (!Object.hasOwn(node, "name")) { 
+            console.warn(`Node ${node.id} claims to be a function but it has no name!`) 
+            return false
+        }
+        if (!Object.hasOwn(node, "mangledName")) { 
+            console.warn(`Node ${node.id} claims to be a function but it has no mangledName!`) 
+            return false
+        }
+        if (!Object.hasOwn(node, "type")) { 
+            console.warn(`Node ${node.id} claims to be a function but it has no type!`) 
+            return false
+        }
+        
+        return true
+    } else {
+        return false
+    }
+}
+
+function isParamVarDecl(node: ASTNode): node is ParamVarDecl {
+    if (node.kind === "ParmVarDecl") {
+        // Check that it has its required fields
+        if (!Object.hasOwn(node, "name")) { 
+            console.warn(`Node ${node.id} claims to be a parameter but it has no name!`) 
+            return false
+        }
+        if (!Object.hasOwn(node, "type")) { 
+            console.warn(`Node ${node.id} claims to be a parameter but it has no type!`) 
+            return false
+        }
+        
+        return true
+    } else {
+        return false
+    }
+}
+
+function isTypedefDecl(node: ASTNode): node is TypedefDecl {
+    if (node.kind === "TypedefDecl") {
+        // Check that it has its required fields
+        if (!Object.hasOwn(node, "name")) { 
+            console.warn(`Node ${node.id} claims to be a typedef but it has no name!`) 
+            return false
+        }
+        if (!Object.hasOwn(node, "type")) { 
+            console.warn(`Node ${node.id} claims to be a typedef but it has no type!`) 
+            return false
+        }
+        
+        return true
+    } else {
+        return false
+    }
+}
+
+function isBuiltinType(node: ASTNode): node is BuiltinType {
+    if (node.kind === "BuiltinType") {
+        // Check that it has its required fields
+        if (!Object.hasOwn(node, "type")) { 
+            console.warn(`Node ${node.id} claims to be a builtin type but it has no type!`) 
+            return false
+        }
+        
+        return true
+    } else {
+        return false
+    }
+}
+
+export function traverse(node: ASTNode, callback: (node: ASTNode) => void) {
+    callback(node)
+    if (node.inner && node.inner.length  > 0) {
+        node.inner.forEach(inner => traverse(inner, callback))
+    } else {
+        return
+    }
+}
+
+export function find_nodes(node: ASTNode, callback: (node: ASTNode) => boolean): ASTNode[] {
+    var found: ASTNode[] = []
+    traverse(node, (node) => {
+        if (callback(node)) {
+            found.push(node)
+        }
+    })
+    return found
+}
+
+function check_node(node: ASTNode): boolean {
+    // Check the node's kind and verify that it matches the kind of the node
+    switch(node.kind) {
+        case "FunctionDecl":
+            return isFunctionDecl(node)
+        case "ParmVarDecl":
+            return isParamVarDecl(node)
+        case "TypedefDecl":
+            return isTypedefDecl(node)
+        case "BuiltinType":
+            return isBuiltinType(node)
+        default:
+            return true
+    }
+}
+
+function check_nodes(node: ASTNode) {
+    traverse(node, (node) => {
+        if (!check_node(node)) {
+            console.warn(`Node ${node.id} is invalid!`)
+        }
+    })
+}
+
+// The AST is a tree of nodes
+export function ParseAST(text: string): ASTNode {
+    // Parse the text as JSON into an ASTNode
+    var ast = JSON.parse(text) as ASTNode
+    // Check that all nodes are valid, and if not, warn the user.
+    check_nodes(ast)
+    return ast
+}
+
+export function GetTypeDefs(ast: ASTNode): Typedefs {
+    var typedefs: Typedefs = {}
+    traverse(ast, (node) => {
+        if (isTypedefDecl(node)) {
+            // Check if the type is defined in the typedefs
+            var ownType = node.type.desugaredQualType ?? node.type.qualType
+            if (ownType in typedefs) {
+                typedefs[node.name] = typedefs[ownType]
+            } else {
+                typedefs[node.name] = ownType
+            }
+        }
+    })
+    return typedefs
+}
+type Typedefs = {[key: string]: string | undefined}
+
+export async function CreateAST(filePath: string, clangExecutable?: string): Promise<ASTNode> {
+    // Run clang on the file and get the AST
+    const cmd = [clangExecutable ?? "clang", "-Xclang", "-ast-dump=json", "-fsyntax-only", filePath]
+    const proc = spawn({cmd: cmd, stdout: "pipe"})
+
+    if (existsSync('./.tmp-ast-test.json')) {
+        rmSync('./.tmp-ast-test.json')
+    }
+    const testFile = Bun.file('./.tmp-ast-test.json').writer()
+
+    var text = ""
+    for await (const chunk of proc.stdout) {
+        text += new TextDecoder().decode(chunk)
+        testFile.write(chunk)
+    }
+    testFile.flush()
+    return ParseAST(text)
+}
+
+// Built-in types that we can match via string comparison
+const static_types = {
+    'void':     'void',
+    
+    'int8_t':   'i8',
+    'int16_t':  'i16',
+    'int32_t':  'i32',
+    'int':      'i32',
+    'int64_t':  'i64',
+
+    'uint8_t':  'u8',
+    'uint16_t': 'u16',
+    'uint32_t': 'u32',
+    'uint64_t': 'u64',
+
+    'float':    'f32',
+    'double':   'f64',
+
+    'bool':     'bool',
+    'char':     'char',
+
+    'char *':   'cstring'
+} as const
+
+export function ctype_to_type(type: string, typedefs: Typedefs): string {
+    if (type in static_types) {
+        //@ts-ignore
+        return static_types[type]
+    } else if (type in typedefs) {
+        var tested_types: string[] = []
+        while (!(type in static_types)) {
+            if (tested_types.includes(type)) {
+                throw new Error(`Type ${type} is not defined!`)
+            }
+            type = typedefs[type] ?? type
+            tested_types.push(type)
+        }
+
+        //@ts-ignore
+        return static_types[type]
+    }
+    else {
+        // Check if the type is a pointer (ends with *)
+        if (type.endsWith("*")) {
+            return "ptr"
+        } 
+        // Check if the type is a function pointer
+        else if (type.match(/\(.*\)\(\*\)\(.*\)/)) {
+            return "function"
+        }
+    }
+
+    throw new Error(`Unknown type ${type}`)
+}

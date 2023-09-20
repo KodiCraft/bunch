@@ -3,25 +3,32 @@
 #ifndef SIMPLE_H
 #define SIMPLE_H
 
-/// @brief Prints a formatted string to stdout
-/// @param fmt Format string 
-/// @param ... Variable arguments
-void printf(const char *fmt, ...);
+/// @brief A simple function with no parameters and that returns nothing
+void no_type();
 
-/// @brief Adds two numbers together
-/// @param a First number
-/// @param b Second number
-/// @return Sum of both numbers
-int add(int a, int b);
+/// @brief This function takes two numbers and returns another number
+/// @param a A first number
+/// @param b A second number
+/// @return A value of some kind
+int binnum(int a, int b);
 
-void* malloc(int size);
+typedef char bool;
 
-// This is here to test if we can do pointer pointers
-char** funny(char* a, char* b);
-          // ^ bun knows char* as a cstring, which helps us out a bit
+// Next are some sample functions
+char* split(char* str, char* delim);
+char* to_string(int num);
+int to_int(char* str);
+bool is_prime(int num);
 
-typedef int funnyType;
+typedef char uint8_t;
 
-funnyType funny2(char*a, char*b);
+uint8_t* to_bytes(int num);
+
+typedef struct {
+    int x;
+    int y;
+} point;
+
+point* make_point(int x, int y);
 
 #endif // SIMPLE_H
