@@ -201,17 +201,17 @@ export async function CreateAST(filePath: string): Promise<ASTNode> {
     const cmd = ["clang", "-Xclang", "-ast-dump=json", "-fsyntax-only", filePath]
     const proc = spawn({cmd: cmd, stdout: "pipe"})
 
-    if (existsSync('./.tmp-ast-test.json')) {
-        rmSync('./.tmp-ast-test.json')
-    }
-    const testFile = Bun.file('./.tmp-ast-test.json').writer()
+    // if (existsSync('./.tmp-ast-test.json')) {
+    //     rmSync('./.tmp-ast-test.json')
+    // }
+    // const testFile = Bun.file('./.tmp-ast-test.json').writer()
 
     var text = ""
     for await (const chunk of proc.stdout) {
         text += new TextDecoder().decode(chunk)
-        testFile.write(chunk)
+        // testFile.write(chunk)
     }
-    testFile.flush()
+    // testFile.flush()
     return ParseAST(text)
 }
 

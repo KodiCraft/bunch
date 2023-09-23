@@ -1,5 +1,4 @@
 import { PluginBuilder, type BunPlugin, OnLoadResult } from "bun"
-import { readFileSync } from "fs"
 import { CreateAST, GetTypeDefs, GetAllSymbols } from "./clang"
 import { SymbolsToFFI } from "./transpiler"
 

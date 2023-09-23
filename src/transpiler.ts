@@ -27,12 +27,12 @@ export function SymbolsToFFI(symbols: Symbol[], libPath: string): string {
 
     out += "export const __MADE_WITH_HBUN = true\n"
 
-    if (existsSync(".tmp-generated.ts")) {
-        rmSync(".tmp-generated.ts")
-    }
-    var testfile = Bun.file(".tmp-generated.ts").writer()
-    testfile.write(out)
-    testfile.flush()
+    // if (existsSync(".tmp-generated.ts")) {
+    //     rmSync(".tmp-generated.ts")
+    // }
+    // var testfile = Bun.file(".tmp-generated.ts").writer()
+    // testfile.write(out)
+    // testfile.flush()
 
     return out;
 }
