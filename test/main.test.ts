@@ -5,7 +5,7 @@ import { FFIType } from 'bun:ffi'
 test("Load simple", async () => {
     var simple = await import('./simple.h')
     expect(simple).toBeDefined()
-    expect(simple.__MADE_WITH_HBUN).toEqual(true)
+    expect(simple.__MADE_WITH_BUNCH).toEqual(true)
 })
 
 test("Run functions", async () => {

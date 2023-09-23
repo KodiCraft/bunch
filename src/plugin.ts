@@ -1,4 +1,7 @@
 import { plugin } from "bun";
-import hbun from ".";
+import bunch from ".";
 
-plugin(hbun({}))
+plugin(bunch({
+    lib_dirs: ["./test"],
+    honor_ld_preload: false
+}))
