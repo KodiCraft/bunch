@@ -22,7 +22,7 @@ export default function hbun(config: HbunConfig): BunPlugin {
         async setup(build: PluginBuilder) {
             build.onLoad({ filter: /^.*\.h/ }, async (args): Promise<OnLoadResult> => {
                 const libPath = args.path.replace(/\.h$/, "")
-                const ast = await CreateAST(args.path, "./bin/clang") // TODO: Allow user to configure this
+                const ast = await CreateAST(args.path)
                 const typedefs = GetTypeDefs(ast)
                 const symbols = GetAllSymbols(ast, typedefs)
                 const exported = SymbolsToFFI(symbols, libPath)

@@ -196,9 +196,9 @@ export function GetTypeDefs(ast: ASTNode): Typedefs {
 }
 type Typedefs = {[key: string]: string | undefined}
 
-export async function CreateAST(filePath: string, clangExecutable?: string): Promise<ASTNode> {
+export async function CreateAST(filePath: string): Promise<ASTNode> {
     // Run clang on the file and get the AST
-    const cmd = [clangExecutable ?? "clang", "-Xclang", "-ast-dump=json", "-fsyntax-only", filePath]
+    const cmd = ["clang", "-Xclang", "-ast-dump=json", "-fsyntax-only", filePath]
     const proc = spawn({cmd: cmd, stdout: "pipe"})
 
     if (existsSync('./.tmp-ast-test.json')) {

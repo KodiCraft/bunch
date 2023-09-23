@@ -54,7 +54,7 @@ test("Run functions", async () => {
 test("Parse AST", async () => {
     const { CreateAST, find_nodes } = await import('../src/clang')
   
-    var ast = await CreateAST('./test/asttest.h', './bin/clang')
+    var ast = await CreateAST('./test/asttest.h')
     expect(ast).toBeDefined()
     expect(ast.kind).toEqual("TranslationUnitDecl")
 
@@ -71,7 +71,7 @@ test("Parse AST", async () => {
 test("Convert C types to TS types", async () => {
     const { CreateAST, find_nodes, GetTypeDefs, ctype_to_type } = await import('../src/clang')
 
-    var ast = await CreateAST('./test/typetest.h', './bin/clang')
+    var ast = await CreateAST('./test/typetest.h')
     expect(ast).toBeDefined()
     
     var typedefs = GetTypeDefs(ast)
@@ -88,14 +88,14 @@ test("Convert C types to TS types", async () => {
     expect(ctype_to_type("(int)(*)(int, int)", typedefs)).toEqual("function")
 
     const fn = find_nodes(ast, (node) => node.kind == "FunctionDecl")[0] as FunctionDecl
-    expect(ctype_to_type(fn.inner?.[0].type.qualType, typedefs)).toEqual("i32")
-    expect(ctype_to_type(fn.inner?.[1].type.qualType, typedefs)).toEqual("i32")
+    expect(ctype_to_type((fn.inner?.[0] as ParamVarDecl).type.qualType, typedefs)).toEqual("i32")
+    expect(ctype_to_type((fn.inner?.[1] as ParamVarDecl).type.qualType, typedefs)).toEqual("i32")
 })
 
 test("Create Symbols from AST", async () => {
     const { CreateAST, GetTypeDefs, GetAllSymbols, GetSymbolFromNode } = await import('../src/clang')
 
-    var ast = await CreateAST('./test/symboltest.h', './bin/clang')
+    var ast = await CreateAST('./test/symboltest.h')
     expect(ast).toBeDefined()
     const typedefs = GetTypeDefs(ast)
     expect(typedefs).toBeDefined()
