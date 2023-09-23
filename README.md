@@ -57,10 +57,12 @@ preload = ["plugins.ts"]
 To import a library, simply import the library's header file like you would any other module:
 
 ```ts
-import simple from "simple.h";
+import { function } from "simple.h";
 ```
 
-Functions defined in `simple.h` are now available to call from the `simple` object. Bun will automatically handle linking the library and loading the functions.
+Functions defined in `simple.h` are now available to call. Bun will automatically handle linking the library and loading the functions.
+
+Note that there is do `default` export yet, but plans are in the works to add one.
 
 ## Issues
 
@@ -81,7 +83,7 @@ Bun custom loaders are not able, to my knowledge, of getting any extra informati
 An idea I considered was to allow you to specify the library to link to in the import statement, like so:
 
 ```ts
-import SDL_image from "SDL_image.h:libSDL2";
+import { /* ... */ } from "SDL_image.h:libSDL2";
 ```
 
 However, due to [https://bun.sh/docs/runtime/modules](the way bun has to handle modules), it is not possible to do this. Bun needs imported file names to be real file names, meaning we can't "smuggle" in extra data in the file name.
