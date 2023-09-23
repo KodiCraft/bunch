@@ -17,7 +17,7 @@ brew install llvm
 Then, add bun\[c/h\] to your project
 
 ```sh
-bun add bunch
+bun add @kodicraft/bunch
 ```
 
 

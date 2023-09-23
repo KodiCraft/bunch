@@ -1,7 +1,8 @@
 {
-  "name": "bunch",
+  "name": "@kodicraft/bunch",
   "module": "src/index.ts",
-  "version": "0.1.0",
+  "main": "src/index.ts",
+  "version": "0.2.0",
   "type": "module",
   "devDependencies": {
     "bun-types": "^1.0.2"
