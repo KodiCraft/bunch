@@ -45,3 +45,12 @@ bun\[c|h\] uses [Conventional Commits](https://www.conventionalcommits.org/en/v1
 When submitting a pull request, please include a description of the changes you made and why you made them. If your pull request fixes an issue, please include a link to the issue in the description.
 
 Pull requests will automatically run the test suite and lint the code. If either of these fail, your pull request will be rejected. If you are having trouble, we will be happy to help you help us help us all.
+
+## Versioning
+
+When bun\[c|h\] is ready to release a new version, a few things need to happen:
+- Updating the version number in the `package.json` file
+- Creating a new tag with the version number
+- Publishing the new version to npm
+
+These must be done manually for now, but we hope to automate this process in the future.
