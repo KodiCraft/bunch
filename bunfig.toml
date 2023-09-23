@@ -1,4 +1,6 @@
 preload = ["./src/plugin.ts"]
 
 [test]
+coverageThreshold = { line = 0.9, function = 1 }
+coverage = true
 preload = ["./src/plugin.ts"]

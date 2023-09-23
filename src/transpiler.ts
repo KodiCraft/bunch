@@ -9,7 +9,6 @@ export function SymbolsToFFI(symbols: Symbol[], libPath: string): string {
 
     // Check that libPath exists and is a valid .so/.dll/.dylib file
     if (!existsSync(`${libPath}`)) {
-        console.error("Remember to compile your library for the correct platform!")
         throw new Error(`Library ${libPath} does not exist! This shouldn't be encountered at this stage!`)
     }
 

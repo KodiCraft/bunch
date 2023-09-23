@@ -51,14 +51,20 @@ test("Run functions", async () => {
     expect(simple.make_point(1, 2)).toBeDefined()
 })
 
+test("Bad library", async () => {
+    const { SymbolsToFFI } = await import('../src/transpiler')
+
+    expect(() => {SymbolsToFFI([], "this_library_doesnt_exist.so")}).toThrow()
+})
+
 test("Parse AST", async () => {
-    const { CreateAST, find_nodes } = await import('../src/clang')
+    const { CreateAST, find_nodes, isFunctionDecl, isParamVarDecl, isTypedefDecl } = await import('../src/clang')
   
     var ast = await CreateAST('./test/asttest.h')
     expect(ast).toBeDefined()
     expect(ast.kind).toEqual("TranslationUnitDecl")
 
-    var fns = find_nodes(ast, (node) => node.kind == "FunctionDecl")
+    var fns = find_nodes(ast, (node) => isFunctionDecl(node))
     expect(fns.length).toEqual(1)
     var fn = fns[0] as FunctionDecl
     expect(fn.inner).toBeDefined()

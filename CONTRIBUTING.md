@@ -36,6 +36,12 @@ To run the tests, run:
 bun test
 ```
 
+While adding new features, you might want to write your own tests. We aim for 90% test coverage. To run the tests in watch mode, run:
+
+```sh
+bun test --watch
+```
+
 ## Commit messages
 
 bun\[c|h\] uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages. We are not strict about this, but following the guidelines helps us keep our commit history clean and readable.

@@ -55,7 +55,7 @@ export interface BuiltinType extends ASTNode {
     inner: undefined
 }
 
-function isFunctionDecl(node: ASTNode): node is FunctionDecl {
+export function isFunctionDecl(node: ASTNode): node is FunctionDecl {
     if (node.kind === "FunctionDecl") {
         // Check that it has its required fields
         if (!Object.hasOwn(node, "name")) { 
@@ -77,7 +77,7 @@ function isFunctionDecl(node: ASTNode): node is FunctionDecl {
     }
 }
 
-function isParamVarDecl(node: ASTNode): node is ParamVarDecl {
+export function isParamVarDecl(node: ASTNode): node is ParamVarDecl {
     if (node.kind === "ParmVarDecl") {
         // Check that it has its required fields
         if (!Object.hasOwn(node, "name")) { 
@@ -95,7 +95,7 @@ function isParamVarDecl(node: ASTNode): node is ParamVarDecl {
     }
 }
 
-function isTypedefDecl(node: ASTNode): node is TypedefDecl {
+export function isTypedefDecl(node: ASTNode): node is TypedefDecl {
     if (node.kind === "TypedefDecl") {
         // Check that it has its required fields
         if (!Object.hasOwn(node, "name")) { 
