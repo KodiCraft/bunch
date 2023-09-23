@@ -1,0 +1,13 @@
+name: Run tests
+on: [push]
+jobs:
+  run-tests:
+    name: run-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+      - uses: egor-tensin/setup-clang@v1
+      
+      - run: bun install
+      - run: bun test
