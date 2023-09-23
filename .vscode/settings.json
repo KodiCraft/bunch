@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.hex": "hexcasting",
+        "cstdint": "cpp"
+    }
+}

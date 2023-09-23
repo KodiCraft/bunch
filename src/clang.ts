@@ -31,7 +31,7 @@ export interface FunctionDecl extends ASTNode {
     name: string
     mangledName: string
     type: {qualType: string}
-    inner: ParamVarDecl[]
+    inner: ASTNode[]
 }
 
 // Parameter declarations
@@ -268,4 +268,38 @@ export function ctype_to_type(type: string, typedefs: Typedefs): string {
     }
 
     throw new Error(`Unknown type ${type}`)
+}
+
+export type Symbol = {
+    name: string
+    args: string[]
+    ret: string
+}
+
+export function GetSymbolFromNode(node: FunctionDecl, typedefs: Typedefs) {
+    var args = node.inner?.map((param) => {
+            if(isParamVarDecl(param)) {
+                return ctype_to_type(param.type.qualType, typedefs)
+            } else {
+                // Skip this node
+                return ""
+            }
+        }) ?? []
+    args = args.filter((arg) => arg != "")
+    // Parse the return type from the functions qualType
+    // A function's qualType looks like this: 'int (int, int)'
+    // The return type is everything up to the first parenthesis
+    const retType = node.type.qualType.split("(")[0].trim()
+    var ret = ctype_to_type(retType, typedefs)
+    return {name: node.name, args: args, ret: ret}
+}
+
+export function GetAllSymbols(node: ASTNode, typedefs: Typedefs): Symbol[] {
+    var symbols: Symbol[] = []
+    traverse(node, (node) => {
+        if (isFunctionDecl(node)) {
+            symbols.push(GetSymbolFromNode(node, typedefs))
+        }
+    })
+    return symbols
 }
