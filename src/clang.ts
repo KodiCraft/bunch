@@ -63,7 +63,7 @@ export class ASTCache {
             if (cache.hash == hash) {
                 return cache
             } else {
-                rmSync(file)
+                rmSync(cachedir + "/" + file)
             }
         }
 
@@ -280,6 +280,10 @@ export async function CreateAST(filePath: string, config: BunchConfig): Promise<
 
         if (!existsSync(cacheDir)) {
             mkdirSync(cacheDir, {recursive: true})
+        }
+
+        if (existsSync(cacheDir + "/" + basename(filePath) + ".astcache")) {
+            rmSync(cacheDir + "/" + basename(filePath) + ".astcache")
         }
 
         const cache = await ASTCache.FromFile(filePath, ast)
