@@ -11,6 +11,8 @@ export type BunchConfig = {
     lib_dirs: string[]
     honor_ld_preload: boolean
     lib_ext?: string
+    bunch_dir: string
+    create_d_ts: boolean
 }
 
 // This is all strings because it will be used to generate typescript code.
@@ -20,10 +22,12 @@ export type Symbol = {
     ret: string
 }
 
-function prepare_config(config: Partial<BunchConfig>): BunchConfig {
+export function prepare_config(config: Partial<BunchConfig>): BunchConfig {
     return {
         lib_dirs: config.lib_dirs ?? ["/usr/lib", "/usr/local/lib"],
-        honor_ld_preload: config.honor_ld_preload ?? true
+        honor_ld_preload: config.honor_ld_preload ?? true,
+        bunch_dir: config.bunch_dir ?? "./.bunch",
+        create_d_ts: config.create_d_ts ?? true,
     }
 }
 
@@ -65,11 +69,11 @@ export default function bunch(config: Partial<BunchConfig>): BunPlugin {
                 const typedefs = GetTypeDefs(ast)
                 const symbols = GetAllSymbols(ast, typedefs)
 
-                const exported = SymbolsToFFI(symbols, libPath)
+                const exported = SymbolsToFFI(symbols, libPath, prepare_config(config))
                 
                 return {
                     contents: exported,
-                    loader: "ts"
+                    loader: "js"
                 }
             })
         }
