@@ -86,7 +86,7 @@ An idea I considered was to allow you to specify the library to link to in the i
 import { /* ... */ } from "SDL_image.h:libSDL2";
 ```
 
-However, due to [https://bun.sh/docs/runtime/modules](the way bun has to handle modules), it is not possible to do this. Bun needs imported file names to be real file names, meaning we can't "smuggle" in extra data in the file name.
+However, due to [the way bun has to handle modules](https://bun.sh/docs/runtime/modules), it is not possible to do this. Bun needs imported file names to be real file names, meaning we can't "smuggle" in extra data in the file name.
 
 ## Contributing
 
