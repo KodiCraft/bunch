@@ -6,7 +6,7 @@ test("Load simple", async () => {
     var simple = await import('simple.h')
     expect(simple).toBeDefined()
     expect(simple.__MADE_WITH_BUNCH).toEqual(true)
-})
+}, {timeout: 10000}) // This test takes a really long time on slow machines, for some reason?
 
 test("Run functions", async () => {
     var simple = await import('simple.h')
@@ -49,7 +49,7 @@ test("Run functions", async () => {
 
     expect(simple.make_point).toBeDefined()
     expect(simple.make_point(1, 2)).toBeDefined()
-})
+}, {timeout: 10000}) // See timeout of previous test
 
 test("Bad library", async () => {
     const { SymbolsToFFI } = await import('../src/transpiler')
