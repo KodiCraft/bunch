@@ -1,5 +1,9 @@
 # bun\[c/h\]
 
+[![Run tests](https://github.com/KodiCraft/bunch/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/KodiCraft/bunch/actions/workflows/tests.yml)
+![npm](https://img.shields.io/npm/dt/@kodicraft/bunch?logo=npm&label=npm%20downloads)
+
+
 bun\[c/h\] (pronounced "bunch") is a [bun](https://bun.sh/) plugin that allows you to automatically import and link C/C++ libraries via C header files.
 
 ## Installation
