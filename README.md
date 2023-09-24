@@ -7,12 +7,20 @@ bun\[c/h\] (pronounced "bunch") is a [bun](https://bun.sh/) plugin that allows y
 Bun\[c/h\] depends on [clang](https://clang.llvm.org/) for parsing C/C++ header files. `clang` must be in your path for bun\[c/h\] to work.
 
 On linux, install `clang` with your distribution's package manager.
-
-On macOS, install `clang` with [Homebrew](https://brew.sh/).
-
 ```sh
-brew install llvm
+# Debian/Ubuntu
+sudo apt install clang
+# Arch
+sudo pacman -S clang
+# etc. you're smart enough to figure it out
 ```
+
+On macOS, `clang` is provided by the xcode command line tools.
+```sh
+xcode-select --install
+```
+
+On windows, you can grab `clang` from [LLVM's releases page](https://llvm.org/builds/). Make sure to add its directory to your PATH.
 
 Then, add bun\[c/h\] to your project
 
