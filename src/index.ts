@@ -13,6 +13,7 @@ export type BunchConfig = {
     lib_ext?: string
     bunch_dir: string
     create_d_ts: boolean
+    use_cache: boolean
 }
 
 // This is all strings because it will be used to generate typescript code.
@@ -28,6 +29,7 @@ export function prepare_config(config: Partial<BunchConfig>): BunchConfig {
         honor_ld_preload: config.honor_ld_preload ?? true,
         bunch_dir: config.bunch_dir ?? "./.bunch",
         create_d_ts: config.create_d_ts ?? true,
+        use_cache: config.use_cache ?? true,
     }
 }
 
@@ -65,7 +67,7 @@ export default function bunch(config: Partial<BunchConfig>): BunPlugin {
                     throw new Error(`Library ${libName} not found!`)
                 }
 
-                const ast = await CreateAST(args.path)
+                const ast = await CreateAST(args.path, prepare_config(config))
                 const typedefs = GetTypeDefs(ast)
                 const symbols = GetAllSymbols(ast, typedefs)
 
