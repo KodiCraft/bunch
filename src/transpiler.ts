@@ -45,7 +45,7 @@ export function SymbolsToFFI(symbols: Symbol[], libPath: string, config: BunchCo
 
         // Create the directory if it doesn't exist
         if (!existsSync(`${config.bunch_dir}/types/${libName}`)) {
-            mkdirSync(`${config.bunch_dir}/${libName}`, {recursive: true})
+            mkdirSync(`${config.bunch_dir}/types/${libName}`, {recursive: true})
         }
 
         // Write the file
