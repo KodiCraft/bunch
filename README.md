@@ -80,7 +80,7 @@ Note that there is do `default` export yet, but plans are in the works to add on
 
 ## Issues
 
-Bun\[c/h\] isn't actually ready for production yet, and this is due to a couple of issues relating to now bun's loaders work. Not only that, but bun\[c/h\] provides rather low-level bindings which, while technically type-safe, are not very ergonomic to call from TypeScript.
+Bun\[c/h\], while technically feature-complete and functional, still provides a couple of drawbacks which may make its usage more difficult (especially when using TypeScript) than I'd like to to be.
 
 ### Loaders and LSP
 Currently, bun's loaders have no way to tie into your LSP. This means that although bun\[c/h\] generates valid TypeScript, intellisense will not be able to provide proper suggestions. Even worse, your LSP will actually report errors when trying to import header files. 
