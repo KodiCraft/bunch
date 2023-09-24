@@ -44,7 +44,7 @@ bun test --watch
 
 ## Commit messages
 
-bun\[c|h\] uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages. We are not strict about this, but following the guidelines helps us keep our commit history clean and readable.
+bun\[c/h\] uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages. We are not strict about this, but following the guidelines helps us keep our commit history clean and readable.
 
 ## Submitting a pull request
 
@@ -54,7 +54,7 @@ Pull requests will automatically run the test suite and lint the code. If either
 
 ## Versioning
 
-When bun\[c|h\] is ready to release a new version, a few things need to happen:
+When bun\[c/h\] is ready to release a new version, a few things need to happen:
 - Updating the version number in the `package.json` file
 - Creating a new tag with the version number
 - Publishing the new version to npm
