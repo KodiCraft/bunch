@@ -3,13 +3,13 @@ import { FunctionDecl, ParamVarDecl } from '../src/clang'
 import { FFIType } from 'bun:ffi'
 
 test("Load simple", async () => {
-    var simple = await import('./simple.h')
+    var simple = await import('simple.h')
     expect(simple).toBeDefined()
     expect(simple.__MADE_WITH_BUNCH).toEqual(true)
 })
 
 test("Run functions", async () => {
-    var simple = await import('./simple.h')
+    var simple = await import('simple.h')
 
     // Helper function to generate a cstring from a string
     function s(str: string): Uint8Array {
@@ -53,8 +53,9 @@ test("Run functions", async () => {
 
 test("Bad library", async () => {
     const { SymbolsToFFI } = await import('../src/transpiler')
+    const { prepare_config } = await import('../src/index')
 
-    expect(() => {SymbolsToFFI([], "this_library_doesnt_exist.so")}).toThrow()
+    expect(() => {SymbolsToFFI([], "this_library_doesnt_exist.so", prepare_config({}))}).toThrow()
 })
 
 test("Parse AST", async () => {

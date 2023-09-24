@@ -17,7 +17,15 @@
     "allowJs": true,
     "types": [
       "bun-types", // add Bun global
-      "./.bunch/types/simple.h.d.ts"
-    ]
+    ],
+
+    // These are the configs you'd need to add to your project for bun[c/h] to work with typescript
+    "typeRoots": [
+      "./.bunch/types",
+      "./node_modules/"
+    ],
+    "paths": {
+      "simple.h": ["./test/simple.h"],
+    }
   }
 }
