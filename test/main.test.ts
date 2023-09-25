@@ -26,8 +26,6 @@ test("Cache", async () => {
         throw new Error("unreachable")
     }
 
-    console.log(cache)
-
     // Check that the cache is valid
     expect(await cache.Check('./test/simple.h')).toEqual(true)
 })
@@ -149,4 +147,48 @@ test("Create Symbols from AST", async () => {
 
     // See ./test/symboltest.h for why this is u8
     expect(symbols[6]).toEqual({name: "func7", args: ["i32"], ret: "u8"})
+})
+
+test("Respect LD_PRELOAD", async () => {
+    const { prepare_config, find_library } = await import('../src/index')
+
+    var config = prepare_config({
+        lib_dirs: [],
+        honor_ld_preload: true
+    })
+
+    // Fail finding the simple.so library without LD_PRELOAD
+    expect(find_library("simple.so", config)).toBeUndefined()
+
+    // Set LD_PRELOAD to include the simple.so's library file
+    const oldPreload = process.env.LD_PRELOAD
+    process.env.LD_PRELOAD = "./test/simple.so"
+
+    // Now we should find it
+    expect(find_library("simple.so", config)).toBeDefined()
+
+    // Now return the LD_PRELOAD variable to its initial state
+    process.env.LD_PRELOAD = oldPreload
+})
+
+test("Respect LD_LIBRARY_PATH", async () => {
+    const { prepare_config, find_library } = await import('../src/index')
+
+    var config = prepare_config({
+        lib_dirs: [],
+        honor_ld_library_path: true
+    })
+
+    // Fail finding the simple.so library without LD_LIBRARY_PATH
+    expect(find_library("simple.so", config)).toBeUndefined()
+
+    // Set LD_LIBRARY_PATH to include the test directory
+    const oldPath = process.env.LD_LIBRARY_PATH
+    process.env.LD_LIBRARY_PATH = "./test"
+
+    // Now we should find it
+    expect(find_library("simple.so", config)).toBeDefined()
+
+    // Now return the LD_LIBRARY_PATH variable to its initial state
+    process.env.LD_LIBRARY_PATH = oldPath
 })
