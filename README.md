@@ -46,8 +46,11 @@ plugin(bunch({
     // Where to find libraries. Bun[c/h] will search for a library with the same name as the header in each directory in order. Defaults to ["/usr/lib", "/usr/local/lib""]
     lib_dirs: ["path/to/libraries"],
 
-    // Whether to honor the LD_PRELOAD environment variable. If true, bun[c/h] will search for libraries in the directories specified by LD_PRELOAD before searching in the directories specified by lib_dirs. Defaults to true.
+    // Whether to honor the LD_PRELOAD environment variable. If true, bun[c/h] will take libraries mentionned by the path here before looking at any other directories. Defaults to true.
     honor_ld_preload: true,
+
+    // Whether to honor the LD_LIBRARY_PATH environment variable. If true, bun[c/h] will add the directories mentioned by the path here to the list of directories to search for libraries. Defaults to true.
+    honor_ld_library_path: true,
 
     // If set, force bun[c/h] to use a specific file extension for libraries instead of using your OS's default. Defaults to undefined.
     lib_ext: "so",
