@@ -2,7 +2,7 @@
   "name": "@kodicraft/bunch",
   "module": "src/index.ts",
   "main": "src/index.ts",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "keywords": [
     "bun",
