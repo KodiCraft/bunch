@@ -18,8 +18,18 @@ test("Cache", async () => {
     // Now import the file normally
     var simple = await import('simple.h')
 
-    // Now the cache should have the file
-    expect(await ASTCache.TryCache('./test/simple.h', './.bunch/cache')).toBeDefined()
+    // Create an ASTCache instance from the newly cached file
+    var cache = await ASTCache.TryCache('./test/simple.h', './.bunch/cache')
+    expect(cache).toBeDefined()
+    // Tell typescript that if we get here, cache is defined
+    if (cache == undefined) {
+        throw new Error("unreachable")
+    }
+
+    console.log(cache)
+
+    // Check that the cache is valid
+    expect(await cache.Check('./test/simple.h')).toEqual(true)
 })
 
 test("Load simple", async () => {

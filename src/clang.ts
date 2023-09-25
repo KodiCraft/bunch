@@ -59,7 +59,9 @@ export class ASTCache {
         // Evaluate the file's hash
         const hash = SHA256.hash(await Bun.file(lib).arrayBuffer()).toString()
         for (const file of cacheFiles) {
-            const cache = JSON.parse(await Bun.file(cachedir + "/" + file).text()) as ASTCache
+            const text = await Bun.file(cachedir + "/" + file).text()
+            const cache = ASTCache.FromJson(text)
+
             if (cache.hash == hash) {
                 return cache
             } else {
@@ -68,6 +70,11 @@ export class ASTCache {
         }
 
         return undefined
+    }
+
+    static FromJson(json: string): ASTCache {
+        const obj = JSON.parse(json)
+        return new ASTCache(obj.libname, obj.hash, obj.ast)
     }
 }
 
