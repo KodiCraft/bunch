@@ -3,6 +3,25 @@ import { FunctionDecl, ParamVarDecl } from '../src/clang'
 import { FFIType } from 'bun:ffi'
 import { prepare_config } from '../src/index'
 
+test("Cache", async () => {
+    const fs = await import('fs')
+    const { ASTCache } = await import('../src/clang')
+
+    // Clear the cache
+    if (fs.existsSync('./.bunch/cache')) {
+        fs.rmSync('./.bunch/cache', {recursive: true})
+    }
+
+    // Trying to load from cache now should return undefined
+    expect(await ASTCache.TryCache('./test/simple.h', './.bunch/cache')).toBeUndefined()
+
+    // Now import the file normally
+    var simple = await import('simple.h')
+
+    // Now the cache should have the file
+    expect(await ASTCache.TryCache('./test/simple.h', './.bunch/cache')).toBeDefined()
+})
+
 test("Load simple", async () => {
     var simple = await import('simple.h')
     expect(simple).toBeDefined()
