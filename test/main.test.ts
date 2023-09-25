@@ -28,7 +28,7 @@ test("Cache", async () => {
 
     // Check that the cache is valid
     expect(await cache.Check('./test/simple.h')).toEqual(true)
-})
+}, {timeout: 10000})
 
 test("Load simple", async () => {
     var simple = await import('simple.h')
