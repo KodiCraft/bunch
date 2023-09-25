@@ -84,6 +84,9 @@ test("Bad library", async () => {
     const { prepare_config } = await import('../src/index')
 
     expect(() => {SymbolsToFFI([], "this_library_doesnt_exist.so", prepare_config({}))}).toThrow()
+
+    //@ts-expect-error <- Since we're deliberately importing something that doesn't exist
+    expect(async () => {await import('this_library_doesnt_exist.h')}).toThrow()
 })
 
 test("Parse AST", async () => {
