@@ -3,5 +3,5 @@ import bunch from ".";
 
 plugin(bunch({
     lib_dirs: ["./test"],
-    honor_ld_preload: false
+    honor_ld_library_path: false
 }))

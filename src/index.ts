@@ -9,6 +9,7 @@ import { suffix } from "bun:ffi"
 
 export type BunchConfig = {
     lib_dirs: string[]
+    honor_ld_library_path: boolean
     honor_ld_preload: boolean
     lib_ext?: string
     bunch_dir: string
@@ -26,6 +27,7 @@ export type Symbol = {
 export function prepare_config(config: Partial<BunchConfig>): BunchConfig {
     return {
         lib_dirs: config.lib_dirs ?? ["/usr/lib", "/usr/local/lib"],
+        honor_ld_library_path: config.honor_ld_library_path ?? true,
         honor_ld_preload: config.honor_ld_preload ?? true,
         bunch_dir: config.bunch_dir ?? "./.bunch",
         create_d_ts: config.create_d_ts ?? true,
@@ -33,13 +35,27 @@ export function prepare_config(config: Partial<BunchConfig>): BunchConfig {
     }
 }
 
-function find_library(lib: string, config: BunchConfig): string | undefined {
+export function find_library(lib: string, config: BunchConfig): string | undefined {
     // Create a list of possible library paths
     var paths = config.lib_dirs
+    
     if (config.honor_ld_preload) {
+        // Begin by checking if the file is among those in LD_PRELOAD before anything else
         var ld_preload = process.env.LD_PRELOAD
         if (ld_preload) {
-            paths = ld_preload.split(":").concat(paths)
+            var filesToTest = ld_preload.split(":")
+            for (var file of filesToTest) {
+                if (basename(file) == lib) {
+                    return file
+                }
+            }
+        }
+    }
+    
+    if (config.honor_ld_library_path) {
+        var ld_library_path = process.env.LD_LIBRARY_PATH
+        if (ld_library_path) {
+            paths = ld_library_path.split(":").concat(paths)
         }
     }
 
