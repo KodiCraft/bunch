@@ -1,6 +1,26 @@
 import { expect, test } from 'bun:test'
 import { FunctionDecl, ParamVarDecl } from '../src/clang'
 import { FFIType } from 'bun:ffi'
+import { prepare_config } from '../src/index'
+
+test("Cache", async () => {
+    const fs = await import('fs')
+    const { ASTCache } = await import('../src/clang')
+
+    // Clear the cache
+    if (fs.existsSync('./.bunch/cache')) {
+        fs.rmSync('./.bunch/cache', {recursive: true})
+    }
+
+    // Trying to load from cache now should return undefined
+    expect(await ASTCache.TryCache('./test/simple.h', './.bunch/cache')).toBeUndefined()
+
+    // Now import the file normally
+    var simple = await import('simple.h')
+
+    // Now the cache should have the file
+    expect(await ASTCache.TryCache('./test/simple.h', './.bunch/cache')).toBeDefined()
+})
 
 test("Load simple", async () => {
     var simple = await import('simple.h')
@@ -61,7 +81,7 @@ test("Bad library", async () => {
 test("Parse AST", async () => {
     const { CreateAST, find_nodes, isFunctionDecl, isParamVarDecl, isTypedefDecl } = await import('../src/clang')
   
-    var ast = await CreateAST('./test/asttest.h')
+    var ast = await CreateAST('./test/asttest.h', prepare_config({}))
     expect(ast).toBeDefined()
     expect(ast.kind).toEqual("TranslationUnitDecl")
 
@@ -78,7 +98,7 @@ test("Parse AST", async () => {
 test("Convert C types to TS types", async () => {
     const { CreateAST, find_nodes, GetTypeDefs, ctype_to_type } = await import('../src/clang')
 
-    var ast = await CreateAST('./test/typetest.h')
+    var ast = await CreateAST('./test/typetest.h', prepare_config({}))
     expect(ast).toBeDefined()
     
     var typedefs = GetTypeDefs(ast)
@@ -102,7 +122,7 @@ test("Convert C types to TS types", async () => {
 test("Create Symbols from AST", async () => {
     const { CreateAST, GetTypeDefs, GetAllSymbols, GetSymbolFromNode } = await import('../src/clang')
 
-    var ast = await CreateAST('./test/symboltest.h')
+    var ast = await CreateAST('./test/symboltest.h', prepare_config({}))
     expect(ast).toBeDefined()
     const typedefs = GetTypeDefs(ast)
     expect(typedefs).toBeDefined()

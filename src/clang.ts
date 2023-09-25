@@ -1,5 +1,8 @@
 import { spawn } from "bun"
-import { rmSync, existsSync } from "fs"
+import { rmSync, existsSync, readdirSync, mkdirSync } from "fs"
+import { SHA256 } from "bun"
+import { basename } from "path"
+import { BunchConfig } from "."
 
 type Empty = Record<PropertyKey, never>
 type Location = Empty | {
@@ -17,6 +20,55 @@ export interface ASTNode {
     loc: Location
     range: {begin: Location, end: Location}
     inner?: ASTNode[]
+}
+
+export class ASTCache {
+    libname: string
+    hash: string
+    ast: ASTNode
+
+    constructor(libname: string, hash: string, ast: ASTNode) {
+        this.libname = libname
+        this.hash = hash
+        this.ast = ast
+    }
+
+    async Check(lib: string): Promise<boolean> {
+        const hash = SHA256.hash(await Bun.file(lib).arrayBuffer()).toString()
+        return hash === this.hash
+    }
+
+    toString(): string {
+        return JSON.stringify(this)
+    }
+
+    static async FromFile(lib: string, ast: ASTNode): Promise<ASTCache> {
+        const hash = SHA256.hash(await Bun.file(lib).arrayBuffer()).toString()
+        return new ASTCache(lib, hash, ast)
+    }
+
+    static async TryCache(lib: string, cachedir: string): Promise<ASTCache | undefined> {
+        if (!existsSync(cachedir)) {
+            mkdirSync(cachedir, {recursive: true})
+        }
+        const dirList = readdirSync(cachedir)
+        const filename = basename(lib)
+        const cacheFiles = dirList.filter((file) => file == filename + ".astcache" )
+        if (cacheFiles.length == 0) { return undefined }
+
+        // Evaluate the file's hash
+        const hash = SHA256.hash(await Bun.file(lib).arrayBuffer()).toString()
+        for (const file of cacheFiles) {
+            const cache = JSON.parse(await Bun.file(cachedir + "/" + file).text()) as ASTCache
+            if (cache.hash == hash) {
+                return cache
+            } else {
+                rmSync(cachedir + "/" + file)
+            }
+        }
+
+        return undefined
+    }
 }
 
 // The nodes that we are interested in are:
@@ -196,7 +248,16 @@ export function GetTypeDefs(ast: ASTNode): Typedefs {
 }
 type Typedefs = {[key: string]: string | undefined}
 
-export async function CreateAST(filePath: string): Promise<ASTNode> {
+export async function CreateAST(filePath: string, config: BunchConfig): Promise<ASTNode> {
+
+    if(config.use_cache) {
+        const cacheDir = config.bunch_dir + "/cache"
+        const cache = await ASTCache.TryCache(filePath, cacheDir)
+        if (cache) {
+            return cache.ast
+        }
+    }
+
     // Run clang on the file and get the AST
     const cmd = ["clang", "-Xclang", "-ast-dump=json", "-fsyntax-only", filePath]
     const proc = spawn({cmd: cmd, stdout: "pipe"})
@@ -212,7 +273,26 @@ export async function CreateAST(filePath: string): Promise<ASTNode> {
         // testFile.write(chunk)
     }
     // testFile.flush()
-    return ParseAST(text)
+    const ast = ParseAST(text)
+
+    if(config.use_cache) {
+        const cacheDir = config.bunch_dir + "/cache"
+
+        if (!existsSync(cacheDir)) {
+            mkdirSync(cacheDir, {recursive: true})
+        }
+
+        if (existsSync(cacheDir + "/" + basename(filePath) + ".astcache")) {
+            rmSync(cacheDir + "/" + basename(filePath) + ".astcache")
+        }
+
+        const cache = await ASTCache.FromFile(filePath, ast)
+        const cacheFile = Bun.file(cacheDir + "/" + basename(filePath) + ".astcache").writer()
+        cacheFile.write(cache.toString())
+        cacheFile.flush()
+    }
+
+    return ast
 }
 
 // Built-in types that we can match via string comparison

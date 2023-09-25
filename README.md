@@ -57,6 +57,9 @@ plugin(bunch({
 
     // Whether or not to create type declarations for libraries. Recommended when using bun[c/h] with TypeScript. Defaults to true.
     create_d_ts: true,
+
+    // Whether or not to use a cache to avoid re-parsing unchanged header files. Defaults to true.
+    use_cache: true,
 }));
 ```
 
