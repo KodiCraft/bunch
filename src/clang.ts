@@ -317,6 +317,18 @@ const static_types = {
     'uint32_t': 'u32',
     'uint64_t': 'u64',
 
+    'unsigned': 'u32',
+    'unsigned int': 'u32',
+    'unsigned long': 'u32',
+    'unsigned long int': 'u32',
+    'unsigned long long': 'u64',
+    'unsigned long long int': 'u64',
+
+    'long':     'i32',
+    'long int': 'i32',
+    'long long': 'i64',
+    'long long int': 'i64',
+
     'float':    'f32',
     'double':   'f64',
 

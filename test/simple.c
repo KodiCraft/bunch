@@ -46,3 +46,8 @@
         p->y = y;
         return p;
     }    
+
+    extern long long weird_types(unsigned long int a, long long int b, unsigned int c) {
+        //printf("weird_types(%lu, %lld, %u)\n", a, b, c);
+        return a + b + c;
+    }

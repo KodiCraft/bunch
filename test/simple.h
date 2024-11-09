@@ -30,4 +30,6 @@ typedef struct {
 
 point* make_point(int x, int y);
 
+long long weird_types(unsigned long int a, long long int b, unsigned int c);
+
 #endif // SIMPLE_H
