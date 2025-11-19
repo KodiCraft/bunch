@@ -31,5 +31,6 @@ typedef struct {
 point* make_point(int x, int y);
 
 long long weird_types(unsigned long int a, long long int b, unsigned int c);
+unsigned char char_types(signed char a, unsigned char b);
 
 #endif // SIMPLE_H

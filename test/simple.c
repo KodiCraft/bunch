@@ -51,3 +51,7 @@
         //printf("weird_types(%lu, %lld, %u)\n", a, b, c);
         return a + b + c;
     }
+
+    extern unsigned char char_types(signed char a, unsigned char b) {
+        return a + b;
+    }
