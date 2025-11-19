@@ -334,6 +334,8 @@ const static_types = {
 
     'bool':     'bool',
     'char':     'char',
+    'unsigned char':    'u8',
+    'signed char':    'i8',
 
     'char *':   'cstring'
 } as const
