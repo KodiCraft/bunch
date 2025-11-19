@@ -57,6 +57,9 @@ test("Run functions", async () => {
     expect(simple.binnum).toBeDefined()
     expect(simple.binnum(1, 2)).toEqual(3)
 
+    expect(simple.weird_types(1, -2, 3)).toEqual(2n) // Remember it returns `long long`
+    expect(simple.char_types(-2, 2)).toEqual(0)
+
     // All functions below this one don't actually run any real code, they just
     // return something.
 
@@ -124,6 +127,8 @@ test("Convert C types to TS types", async () => {
     expect(ctype_to_type("fatnumber", typedefs)).toEqual("i32")
     expect(ctype_to_type("char * *", typedefs)).toEqual("ptr")
     expect(ctype_to_type("(int)(*)(int, int)", typedefs)).toEqual("function")
+    expect(ctype_to_type("unsigned char", typedefs)).toEqual("u8")
+    expect(ctype_to_type("signed char", typedefs)).toEqual("i8")
 
     const fn = find_nodes(ast, (node) => node.kind == "FunctionDecl")[0] as FunctionDecl
     expect(ctype_to_type((fn.inner?.[0] as ParamVarDecl).type.qualType, typedefs)).toEqual("i32")
